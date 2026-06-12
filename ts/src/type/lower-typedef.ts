@@ -288,7 +288,10 @@ function schemaExprToTypeExpr(expr: SExpr): TypeExpr {
             message: "Brand schema expects a brand name and base schema",
           });
         }
-        return TESym(spanOf(expr.items[1]!), asSym(expr.items[1]!, "Brand schema name"));
+        return TEApp(spanOf(expr), TESym(spanOf(expr.items[0]!), "Brand"), [
+          TESym(spanOf(expr.items[1]!), asSym(expr.items[1]!, "Brand schema name")),
+          schemaExprToTypeExpr(expr.items[2]!),
+        ]);
       }
       case "Enum":
         return enumSchemaTypeExpr(expr);
@@ -331,7 +334,10 @@ function schemaExprToTypeExpr(expr: SExpr): TypeExpr {
       default:
         if (expr.items.length > 1 && hasOnlyMetadataPairs(expr.items, 1)) {
           const brand = metadataSymbol(expr.items, ":brand");
-          return brand ?? schemaExprToTypeExpr(expr.items[0]!);
+          const base = schemaExprToTypeExpr(expr.items[0]!);
+          return brand
+            ? TEApp(spanOf(expr), TESym(spanOf(expr.items[0]!), "Brand"), [brand, base])
+            : base;
         }
         break;
     }
