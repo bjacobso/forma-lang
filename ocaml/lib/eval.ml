@@ -68,7 +68,11 @@ let rec eval_expr env expr =
   let result =
     match expr with
     | Reader.List (_, Reader.Symbol (_, ("perform" | "handle")) :: _) ->
-        Eval_effect.eval (eval_effect_callbacks ()) env expr
+        Error
+          [
+            diagnostic "eval/legacy-effect"
+              "perform and handle are not public Forma forms; use services, operations, and typed catch.";
+          ]
     | Reader.Nil _ -> Ok VNil
     | Reader.Bool (_, value) -> Ok (VBool value)
     | Reader.Int (_, value) -> Ok (VInt value)

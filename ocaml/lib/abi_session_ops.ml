@@ -77,7 +77,7 @@ let expr_updates_session (env : Eval.env) = function
             ( "define" | "def" | "defn" | "defmacro" | "define-macro"
             | "define-form" | "meta-fn" | "define-elaboration"
             | "define-elaboration-primitive" | "define-protocol"
-            | "define-payload-contract" | "define-effect" ) )
+            | "define-payload-contract" ) )
         :: _ ) ->
       true
   | Ast.List (_, Ast.Symbol (_, op) :: args) ->
@@ -92,8 +92,8 @@ let expr_binding_name (env : Eval.env) = function
           ( _,
             ( "define-form" | "meta-fn" | "define-elaboration"
             | "define-elaboration-primitive" | "define-protocol"
-            | "define-payload-contract" | "define-effect" | "defmacro"
-            | "define-macro" | "defn" ) )
+            | "define-payload-contract" | "defmacro" | "define-macro"
+            | "defn" ) )
         :: Ast.Symbol (_, name)
         :: _ ) ->
       Some name

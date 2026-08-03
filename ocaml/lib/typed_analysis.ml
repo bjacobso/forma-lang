@@ -113,6 +113,20 @@ and annotate_children callbacks env expr ty =
           match annotate_expr callbacks env body with
           | Error _ as error -> error
           | Ok body_annotations -> Ok (binding_annotations @ body_annotations)))
+  | Core_ast.EffectFail (_, _, payload) -> annotate_expr callbacks env payload
+  | Core_ast.EffectCatch (_, body, error_name, binding, handler) -> (
+      match annotate_expr callbacks env body with
+      | Error _ as error -> error
+      | Ok body_annotations ->
+          let error_ty = Option.value (Type_env.lookup error_name env) ~default:Type_expr.TAny in
+          let handler_env =
+            Type_env.bind binding.name
+              (Type_env.Forall ([], error_ty, [], Type_env.Plain))
+              env
+          in
+          (match annotate_expr callbacks handler_env handler with
+          | Error _ as error -> error
+          | Ok handler_annotations -> Ok (body_annotations @ handler_annotations)))
   | Core_ast.If (_, condition, consequent, alternate) ->
       annotate_expr_list callbacks env [ condition; consequent; alternate ]
   | Core_ast.Record (_, fields) ->

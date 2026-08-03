@@ -1,10 +1,10 @@
-# onlang — Vision
+# Forma — Vision
 
 A typed Lisp built to host domain DSLs.
 
-## What onlang Is
+## What Forma Is
 
-onlang is a small, homoiconic, macro-first programming language. It takes
+Forma is a small, homoiconic, macro-first programming language. It takes
 the parts of Clojure that most users agree were right — immutable data,
 macros, REPL — and integrates three things Clojure users have spent a
 decade patching in from the outside:
@@ -13,18 +13,16 @@ decade patching in from the outside:
   Macros produce typed intermediate representation, not just syntactic
   expansions. Errors point at the source form the author wrote, not at
   the expanded shape.
-- **An effect system.** Operations that do I/O are `!`-suffixed and
-  resolve to handlers in scope. The shipping substrate is
-  elaboration-time capability resolution (see `design-decisions.md`);
-  the surface is compatible with a future row-polymorphic substrate if
-  a workload ever demands it.
+- **An operational effect contract.** `Effect<A,E,R>` records success, closed
+  typed-error sets, and closed operation-capability sets. Service calls and
+  typed recovery lower to portable IR; runtimes provide adapters over that IR.
 - **Elaborator reflection.** Host programs can register descriptors and
   meta hooks that participate in elaboration, producing their own typed
   IR nodes from Lisp source. Host-specific forms (`define-entity`,
   `define-api-group`, and so on) are preludes, not built-ins. The
   engine ships with no domain vocabulary.
 
-onlang compiles via OCaml to native, JavaScript, and WebAssembly. The engine is
+Forma compiles via OCaml to native, JavaScript, and WebAssembly. The engine is
 a portable frontend: source and preludes go in, diagnostics and canonical IR
 come out. Backends over that IR produce target-specific code, schemas, tools,
 plans, and generated review documents.
@@ -55,11 +53,10 @@ _combination_ — all three in the same small Lisp — is different:
   and runtime validators until the types are back, just ad-hoc. A Lisp
   with typed macros lets every DSL author the surface they want without
   giving up error quality.
-- Effects without elaboration-time handler resolution force every call
-  site to thread rows explicitly, or pay for runtime continuation
-  capture everywhere. With elaboration-time resolution, the type system
-  is plain Hindley-Milner and effect calls are direct function calls
-  after expand.
+- Operational effects need portable, inspectable semantics without forcing
+  every backend to implement continuation capture. Closed `E` and `R` sets
+  preserve plain Hindley-Milner inference while explicit calls, failure, and
+  catch remain visible in IR.
 - A DSL without elaborator reflection either bakes its vocabulary into
   the host language (closing the extension point) or reduces to an
   interpreter over untyped data (losing error quality). With
@@ -90,9 +87,9 @@ not in three libraries glued together.
 6. **Typed all the way down.** Canonical IR is a typed variant, not
    untyped JSON that happens to round-trip. JSON is the wire format, not
    the internal representation.
-7. **Elaboration-time handlers over runtime continuations.** Effects are
-   resolved to direct calls at expand time wherever possible. Runtime
-   effect machinery is the escape hatch, not the default.
+7. **Portable IR over runtime-specific effect libraries.** Service calls,
+   constructed errors, failure, and catch remain explicit in canonical IR.
+   Effect-TS or OCaml effects may implement an adapter but do not define Forma.
 8. **Portable engine.** One codebase compiled to native, JS, and Wasm.
    The same bytes of program behave the same across targets, or a parity
    test fails.
@@ -111,10 +108,9 @@ onlang is not:
   authors of operational workflow systems, domain-specific DSLs, and
   schema-heavy APIs. If your program is CPU-bound numeric code, use a
   different language.
-- **A research vehicle for novel type theory.** onlang uses Hindley-Milner
-  plus capability-based handlers because both are understood. Earlier
-  row-effect research has been subsumed by the mainline mechanics fixtures and
-  is no longer a live implementation lane.
+- **A research vehicle for novel type theory.** Forma uses Hindley-Milner plus
+  closed finite error and requirement sets. Open effect rows, dynamic handlers,
+  and resumable continuations are not a live implementation lane.
 - **A competitor to mainstream typed FP.** If Haskell, OCaml, or
   F\* fits, use them. onlang's reason to exist is the combination — typed
   Lisp plus elaborator reflection plus cheap effect handling — not the

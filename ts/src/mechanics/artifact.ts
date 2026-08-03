@@ -506,6 +506,10 @@ function operationDeclaration(
     operationEffects,
     signatureJson.value.effect,
   );
+  const capabilities =
+    isRecord(signatureJson.value.effect) && Array.isArray(signatureJson.value.effect["requirements"])
+      ? signatureJson.value.effect["requirements"]
+      : [];
 
   return {
     ok: true,
@@ -516,6 +520,7 @@ function operationDeclaration(
         name,
         params: signatureJson.value.params,
         effect: signatureJson.value.effect,
+        authority: { capabilities },
         body,
       },
       payloadContract: "mechanics/effect-def/v0",
@@ -596,10 +601,18 @@ function effectCoreExprToJson(
       case "fail":
         return {
           kind: "Fail",
-          error: scalarName(expr.items[1]) ?? valueExprToCoreJson(sourceId, expr.items[1]!),
+          error: errorValueToCoreJson(sourceId, expr.items[1]!),
           effect,
           span: spanJson(sourceId, expr),
         };
+      case "catch":
+        return effectCatchToJson(
+          sourceId,
+          expr,
+          serviceMethodEffects,
+          operationEffects,
+          effect,
+        );
       case "<-":
         return {
           kind: "Bind",
@@ -882,6 +895,54 @@ function effectMatchToJson(
   };
 }
 
+function effectCatchToJson(
+  sourceId: string,
+  expr: Extract<SExpr, { readonly _tag: "List" }>,
+  serviceMethodEffects: ServiceMethodEffects,
+  operationEffects: OperationEffects,
+  effect: JsonValue,
+): JsonValue {
+  const pattern = expr.items[2];
+  const errorType = pattern?._tag === "List" ? scalarName(pattern.items[0]) : undefined;
+  const binding = pattern?._tag === "List" ? scalarName(pattern.items[1]) : undefined;
+  return {
+    kind: "Catch",
+    body: effectCoreExprToJson(
+      sourceId,
+      expr.items[1]!,
+      serviceMethodEffects,
+      operationEffects,
+      effect,
+    ),
+    errorType: errorType ?? "UnknownError",
+    binding: binding ?? "error",
+    handler: effectCoreExprToJson(
+      sourceId,
+      expr.items[3]!,
+      serviceMethodEffects,
+      operationEffects,
+      effect,
+    ),
+    effect,
+    span: spanJson(sourceId, expr),
+  };
+}
+
+function errorValueToCoreJson(sourceId: string, expr: SExpr): JsonValue {
+  if (expr._tag === "List" && expr.items.length === 2) {
+    const errorType = scalarName(expr.items[0]);
+    if (errorType) {
+      return {
+        kind: "Error",
+        errorType,
+        payload: valueExprToCoreJson(sourceId, expr.items[1]!),
+        span: spanJson(sourceId, expr),
+      };
+    }
+  }
+  return valueExprToCoreJson(sourceId, expr);
+}
+
 function valueExprToCoreJson(sourceId: string, expr: SExpr): JsonValue {
   switch (expr._tag) {
     case "Sym":
@@ -1030,7 +1091,7 @@ function methodToJson(sourceId: string, serviceName: string, expr: SExpr): Mecha
   const params = methodParamsToJson(sourceId, expr.items[1]!);
   if (!params.ok) return params;
 
-  const effect = effectTypeToJson(sourceId, expr.items[2]!, serviceName);
+  const effect = effectTypeToJson(sourceId, expr.items[2]!, `${serviceName}.${name}`);
   if (!effect.ok) return effect;
 
   return {
@@ -1171,7 +1232,7 @@ function typeExprToJson(sourceId: string, expr: SExpr): MechanicsJsonResult {
 function effectTypeToJson(
   sourceId: string,
   expr: SExpr,
-  serviceRequirement?: string,
+  operationRequirement?: string,
 ): MechanicsJsonResult {
   if (
     expr._tag !== "List" ||
@@ -1203,8 +1264,8 @@ function effectTypeToJson(
   if (!requirements.ok) return requirements;
 
   const requirementNames = [...(requirements.value as string[])];
-  if (serviceRequirement && !requirementNames.includes(serviceRequirement)) {
-    requirementNames.push(serviceRequirement);
+  if (operationRequirement && !requirementNames.includes(operationRequirement)) {
+    requirementNames.push(operationRequirement);
   }
 
   return {
@@ -1244,7 +1305,7 @@ function symbolicSetToJson(sourceId: string, expr: SExpr, label: string): Mechan
         ],
       };
     }
-    names.push(name);
+    if (!names.includes(name)) names.push(name);
   }
 
   return { ok: true, value: names };

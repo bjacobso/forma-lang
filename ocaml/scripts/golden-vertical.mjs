@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { createInterface } from "node:readline";
 import { packageDir, readPreludes } from "./corpus.mjs";
@@ -93,13 +93,11 @@ const fieldSchema = (schema, fieldName) =>
   schema?.fields?.find((field) => field?.name === fieldName)?.schema;
 
 const effectContractSourceId = "golden-vertical/effect-contract";
-const effectContractSource = `
-(define-effect Console
-  (op print (-> String Unit)))
-(: log (->! {Console} String Unit))
-(define log (fn [msg] (perform print msg)))
-log
-`;
+const effectFixtureDir = resolve(packageDir, "../conformance/operational-effects");
+const effectContractSource = readFileSync(resolve(effectFixtureDir, "program.lisp"), "utf8");
+const effectGolden = JSON.parse(
+  readFileSync(resolve(effectFixtureDir, "expected.json"), "utf8"),
+);
 
 const sourceId = "golden-vertical/agent-tool-slice";
 const source = `
@@ -139,7 +137,9 @@ try {
   });
   expectOk("effect contract typecheck", effectTypecheck);
   expectNoErrorDiagnostics("effect contract typecheck", effectTypecheck);
-  if (effectTypecheck.type !== "Str -{Console}-> Unit") {
+  if (
+    effectTypecheck.type !== effectGolden.types.ocaml
+  ) {
     throw new Error(
       `Unexpected effect contract type ${JSON.stringify(effectTypecheck.type)}:\n${JSON.stringify(
         effectTypecheck,
@@ -152,6 +152,48 @@ try {
   const opened = await request({ op: "openSession" });
   expectOk("openSession", opened);
   sessionId = opened.value.sessionId;
+
+  const effectLoaded = await request({
+    op: "loadSource",
+    sessionId,
+    sourceId: effectContractSourceId,
+    source: effectContractSource,
+  });
+  expectOk("loadSource effect contract", effectLoaded);
+
+  const effectEmitted = await request({
+    op: "emit",
+    sessionId,
+    backend: "canonical-ir",
+    sourceId: effectContractSourceId,
+  });
+  expectOk("emit effect contract", effectEmitted);
+  const effectDeclarations = effectEmitted.value?.artifacts?.[0]?.content?.declarations;
+  const service = effectDeclarations?.find(
+    (declaration) => declaration?.kind === "ServiceDef" && declaration?.name === "Console",
+  );
+  const failed = effectDeclarations?.find(
+    (declaration) => declaration?.kind === "EffectDef" && declaration?.name === "always-fail",
+  );
+  const recovered = effectDeclarations?.find(
+    (declaration) => declaration?.kind === "EffectDef" && declaration?.name === "recover",
+  );
+  const logged = effectDeclarations?.find(
+    (declaration) => declaration?.kind === "EffectDef" && declaration?.name === "log",
+  );
+  if (
+    service?.methods?.[0]?.effect?.requirements?.join(",") !== effectGolden.serviceCapability ||
+    failed?.body?.kind !== "Fail" ||
+    failed?.body?.error?.kind !== "Error" ||
+    failed?.body?.error?.errorType !== effectGolden.failedErrorType ||
+    recovered?.body?.kind !== "Catch" ||
+    recovered?.body?.errorType !== effectGolden.caughtErrorType ||
+    logged?.authority?.capabilities?.join(",") !== effectGolden.authorityCapabilities.join(",")
+  ) {
+    throw new Error(
+      `Unexpected operational effect IR:\n${JSON.stringify(effectEmitted, null, 2)}`,
+    );
+  }
 
   for (const prelude of readPreludes()) {
     const response = await request({

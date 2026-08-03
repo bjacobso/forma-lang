@@ -145,6 +145,8 @@ export type CoreExpr =
   | CApp
   | CLet
   | CEffectDo
+  | CEffectFail
+  | CEffectCatch
   | CIf
   | CRecord
   | CGet
@@ -202,6 +204,26 @@ export interface CEffectDo {
   readonly span: Span;
   readonly bindings: readonly Binding[];
   readonly body: CoreExpr;
+}
+
+/** A typed failure value: (fail (ErrorName payload)). */
+export interface CEffectFail {
+  readonly _tag: "EffectFail";
+  readonly id: string;
+  readonly span: Span;
+  readonly errorName: string;
+  readonly payload: CoreExpr;
+}
+
+/** Recover one typed error: (catch effect (ErrorName binding) handler). */
+export interface CEffectCatch {
+  readonly _tag: "EffectCatch";
+  readonly id: string;
+  readonly span: Span;
+  readonly body: CoreExpr;
+  readonly errorName: string;
+  readonly binding: Param;
+  readonly handler: CoreExpr;
 }
 
 export interface CIf {
@@ -446,6 +468,34 @@ export const CEffectDo = (span: Span, bindings: readonly Binding[], body: CoreEx
   body,
 });
 
+export const CEffectFail = (
+  span: Span,
+  errorName: string,
+  payload: CoreExpr,
+): CEffectFail => ({
+  _tag: "EffectFail",
+  id: freshNodeId(),
+  span,
+  errorName,
+  payload,
+});
+
+export const CEffectCatch = (
+  span: Span,
+  body: CoreExpr,
+  errorName: string,
+  binding: Param,
+  handler: CoreExpr,
+): CEffectCatch => ({
+  _tag: "EffectCatch",
+  id: freshNodeId(),
+  span,
+  body,
+  errorName,
+  binding,
+  handler,
+});
+
 export const CIf = (span: Span, cond: CoreExpr, then: CoreExpr, else_: CoreExpr): CIf => ({
   _tag: "If",
   id: freshNodeId(),
@@ -608,6 +658,10 @@ export const exprChildren = (expr: CoreExpr): readonly CoreExpr[] => {
       return [...expr.bindings.map((b) => b.expr), expr.body];
     case "EffectDo":
       return [...expr.bindings.map((b) => b.expr), expr.body];
+    case "EffectFail":
+      return [expr.payload];
+    case "EffectCatch":
+      return [expr.body, expr.handler];
     case "If":
       return [expr.cond, expr.then, expr.else_];
     case "Record":

@@ -195,6 +195,8 @@ function evalAuthorityExpr(expr: CoreExpr, env: AbsEnv, depth = 0): AbsValue {
     case "Record":
     case "Get":
     case "EffectDo":
+    case "EffectFail":
+    case "EffectCatch":
     case "DSLForm":
     case "TypeDef":
     case "Match":

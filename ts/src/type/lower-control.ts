@@ -4,9 +4,19 @@
 import type { SExpr } from "../reader/index.js";
 import { trySym, asSym, asList, headSym } from "../reader/types.js";
 import type { CoreExpr, Span } from "./core-expr.js";
-import { CLit, CIf, CGet, CAscribe, CMatch, LNil } from "./core-expr.js";
+import {
+  CLit,
+  CIf,
+  CGet,
+  CAscribe,
+  CMatch,
+  CEffectFail,
+  CEffectCatch,
+  LNil,
+  mkParam,
+} from "./core-expr.js";
 import { InferenceError } from "./errors.js";
-import type { LowerFn } from "./lower-core.js";
+import { spanOf, type LowerFn } from "./lower-core.js";
 import { lowerDoBody } from "./lower-binding.js";
 import { parseTypeExpr } from "./type-parser.js";
 
@@ -106,4 +116,41 @@ export function lowerAscribe(lower: LowerFn, span: Span, items: readonly SExpr[]
   const expr = lower(items[1]!);
   const typeExpr = parseTypeExpr(items[2]!);
   return CAscribe(span, expr, typeExpr);
+}
+
+export function lowerEffectFail(lower: LowerFn, span: Span, items: readonly SExpr[]): CoreExpr {
+  const error = items[1];
+  if (
+    items.length !== 2 ||
+    error?._tag !== "List" ||
+    error.items.length !== 2 ||
+    error.items[0]?._tag !== "Sym"
+  ) {
+    throw new InferenceError({
+      message: "fail expects a constructed error value: (fail (ErrorName payload)).",
+    });
+  }
+  return CEffectFail(span, error.items[0].name, lower(error.items[1]!));
+}
+
+export function lowerEffectCatch(lower: LowerFn, span: Span, items: readonly SExpr[]): CoreExpr {
+  const pattern = items[2];
+  if (
+    items.length !== 4 ||
+    pattern?._tag !== "List" ||
+    pattern.items.length !== 2 ||
+    pattern.items[0]?._tag !== "Sym" ||
+    pattern.items[1]?._tag !== "Sym"
+  ) {
+    throw new InferenceError({
+      message: "catch expects (catch effect (ErrorName binding) handler).",
+    });
+  }
+  return CEffectCatch(
+    span,
+    lower(items[1]!),
+    pattern.items[0].name,
+    mkParam(spanOf(pattern.items[1]), pattern.items[1].name),
+    lower(items[3]!),
+  );
 }

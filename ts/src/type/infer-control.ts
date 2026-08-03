@@ -9,7 +9,8 @@ import { unify } from "./unify.js";
 import { InferContext } from "./context.js";
 import { InferenceError } from "./errors.js";
 import type { CoreExpr } from "./core-expr.js";
-import { originOf, detectTypeNarrowing } from "./infer-core.js";
+import { TESym } from "./core-expr.js";
+import { originOf, detectTypeNarrowing, typeExprToType } from "./infer-core.js";
 import { instantiate } from "./scheme-ops.js";
 import type { InferFn } from "./infer-binding.js";
 
@@ -132,6 +133,95 @@ function operationalEffectType(
     TApp(TCon("RequirementSet"), requirements),
   ]);
 }
+
+// ---------------------------------------------------------------------------
+// Operational failure and recovery
+// ---------------------------------------------------------------------------
+
+export const inferEffectFail = (
+  env: TypeEnv,
+  expr: CoreExpr & { _tag: "EffectFail" },
+  inferExpr: InferFn,
+): Effect.Effect<Type, InferenceError, InferContext> =>
+  Effect.gen(function* () {
+    const ctx = yield* InferContext;
+    const errorTypes = yield* Ref.get(ctx.errorTypes);
+    if (!errorTypes.has(expr.errorName)) {
+      return yield* ctx.fail(originOf(expr, "effect-fail"), {
+        message: `Unknown error type ${expr.errorName}. Define it with define-error before using fail.`,
+      });
+    }
+    const payloadType = yield* inferExpr(env, expr.payload);
+    const expectedPayload = yield* typeExprToType(
+      TESym(expr.span, expr.errorName),
+      new Map<string, Type>(),
+      new Map(),
+    );
+    yield* unify(
+      applyType(yield* Ref.get(ctx.subst), expectedPayload),
+      applyType(yield* Ref.get(ctx.subst), payloadType),
+      originOf(expr, "effect-fail-payload"),
+    );
+    return operationalEffectType(yield* ctx.freshTVar, [TCon(expr.errorName)], []);
+  });
+
+export const inferEffectCatch = (
+  env: TypeEnv,
+  expr: CoreExpr & { _tag: "EffectCatch" },
+  inferExpr: InferFn,
+): Effect.Effect<Type, InferenceError, InferContext> =>
+  Effect.gen(function* () {
+    const ctx = yield* InferContext;
+    const errorTypes = yield* Ref.get(ctx.errorTypes);
+    if (!errorTypes.has(expr.errorName)) {
+      return yield* ctx.fail(originOf(expr, "effect-catch"), {
+        message: `Unknown error type ${expr.errorName}. Define it with define-error before using catch.`,
+      });
+    }
+    const bodyType = applyType(yield* Ref.get(ctx.subst), yield* inferExpr(env, expr.body));
+    const bodyEffect = operationalEffectParts(bodyType);
+    if (!bodyEffect) {
+      return yield* ctx.fail(originOf(expr, "effect-catch"), {
+        message: `catch expects Effect, received ${showType(bodyType)}.`,
+      });
+    }
+
+    const handled = bodyEffect.errors.find(
+      (error) => error._tag === "TCon" && error.name === expr.errorName,
+    );
+    if (!handled) {
+      return yield* ctx.fail(originOf(expr, "effect-catch"), {
+        message: `Impossible catch: ${expr.errorName} is not in ${showType(bodyType)}.`,
+      });
+    }
+
+    const payloadType = yield* typeExprToType(
+      TESym(expr.binding.span, expr.errorName),
+      new Map<string, Type>(),
+      new Map(),
+    );
+    const handlerEnv = new Map(applyEnv(yield* Ref.get(ctx.subst), env));
+    handlerEnv.set(expr.binding.name, mono(payloadType));
+    const handlerType = applyType(
+      yield* Ref.get(ctx.subst),
+      yield* inferExpr(handlerEnv, expr.handler),
+    );
+    const handlerEffect = operationalEffectParts(handlerType);
+    const handlerSuccess = handlerEffect?.success ?? handlerType;
+    yield* unify(bodyEffect.success, handlerSuccess, originOf(expr, "effect-catch-result"));
+
+    const subst = yield* Ref.get(ctx.subst);
+    return operationalEffectType(
+      applyType(subst, bodyEffect.success),
+      mergeTypeSets(
+        bodyEffect.errors.filter(
+          (error) => !(error._tag === "TCon" && error.name === expr.errorName),
+        ),
+        handlerEffect?.errors ?? [],
+      ),
+      mergeTypeSets(bodyEffect.requirements, handlerEffect?.requirements ?? []),
+    );
+  });
 
 // ---------------------------------------------------------------------------
 // Match (pattern matching)

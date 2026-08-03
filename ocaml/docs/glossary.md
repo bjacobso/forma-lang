@@ -1,6 +1,6 @@
 # Glossary
 
-Short anchors for onlang-specific terms. If a word appears in the other
+Short anchors for Forma-specific terms. If a word appears in the other
 docs without definition, it is probably here.
 
 ## ABI
@@ -32,11 +32,10 @@ prelude hashes, declaration provenance, and all diagnostics.
 
 ## Capability
 
-A record whose fields are operation implementations. A handler
-installs a capability for the duration of an expression; `!`-suffix
-calls in that scope resolve to field access on the bound capability.
-The shipping effect substrate (see `design-decisions.md` § 2) is
-capabilities plus elaboration-time resolution.
+An operation-granular permission and runtime dependency, such as
+`EmployeeStore.find`. Service calls add their capability to an operation's
+closed requirement set. The same identifier is used by typechecking, runtime
+provisioning, and authority manifests.
 
 ## CST
 
@@ -51,14 +50,11 @@ their types, their validators, and the meta hooks that run during
 elaboration. The engine dispatches to descriptors by name without
 knowing what the form means. See `lib/descriptor.ml`.
 
-## Effect row
+## Effect contract
 
-A type-level list of effect operations an expression may perform. In
-onlang's shipping substrate, effect rows are present in the surface type
-grammar but do not require row-polymorphic inference; they are
-checked as ordinary records of capabilities via elaboration-time
-resolution. Full row-polymorphic inference is not a live implementation
-track.
+`Effect<A,E,R>` describes success, typed errors, and required capabilities.
+`E` and `R` are normalized closed finite sets in v1; they are not open or
+row-polymorphic.
 
 ## Elaboration
 
@@ -75,12 +71,11 @@ onlang's elaborator reflection is the descriptor + meta hook protocol.
 Racket calls the same idea "macros that produce typed programs";
 Lean 4 calls it "elaboration monad extension."
 
-## Handler
+## Catch
 
-A form that installs a capability for the duration of an
-expression. `(with-handler [blob-store (make …)] body)` binds
-`blob-store` in the scope of `body`; every `blob-store/op!` call
-in `body` resolves to a field access on the bound record.
+Typed local recovery. `(catch body (ErrorName payload) handler)` removes
+`ErrorName` from the body's error set, binds its schema-backed payload, and
+unions the handler's errors and requirements into the resulting contract.
 
 ## Meta hook
 
@@ -92,10 +87,8 @@ contexts where no IR fragment is needed.
 
 ## Operation
 
-A named, typed effect: `:blob-store/upload`, `:raise/NotFound`,
-etc. Operations are declared with `define-operation`, specify
-input, output, and raisable error types, and are invoked through
-`!`-suffix syntax or explicit `perform`.
+A named operational program declared with `define-operation`. Its signature
+specifies an `Effect<A,E,R>`, and its body lowers to portable mechanics IR.
 
 ## Prelude
 

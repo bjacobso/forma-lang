@@ -35,8 +35,7 @@ import { WELL_KNOWN_KEYWORDS } from "./builtin-schemes.js";
 import { instantiate, instantiateWithConstraints } from "./scheme-ops.js";
 import { emitAmbientEffect, withAmbientEffectScope } from "./effect-helpers.js";
 import { inferLet } from "./infer-binding.js";
-import { inferIf } from "./infer-control.js";
-import { inferMatch } from "./infer-control.js";
+import { inferIf, inferMatch, inferEffectFail, inferEffectCatch } from "./infer-control.js";
 import { inferRecord, inferGet } from "./infer-record.js";
 import { inferDef } from "./infer-binding.js";
 import { inferAscribe, inferDSLForm } from "./infer-dsl.js";
@@ -324,6 +323,10 @@ const inferExprInner = (
       return inferLet(env, expr, inferExpr);
     case "EffectDo":
       return inferEffectDo(env, expr);
+    case "EffectFail":
+      return inferEffectFail(env, expr, inferExpr);
+    case "EffectCatch":
+      return inferEffectCatch(env, expr, inferExpr);
     case "If":
       return inferIf(env, expr, inferExpr);
     case "Record":
@@ -416,22 +419,6 @@ const inferOperationalSucceed = (
 
     const valueType = yield* inferExpr(env, expr.args[0]!);
     return operationalEffectType(applyType(yield* Ref.get(ctx.subst), valueType), [], []);
-  });
-
-const inferOperationalFail = (
-  expr: CoreExpr & { _tag: "App" },
-): Effect.Effect<Type, InferenceError, InferContext> =>
-  Effect.gen(function* () {
-    const ctx = yield* InferContext;
-    if (expr.args.length !== 1 || expr.args[0]!._tag !== "Var") {
-      return yield* ctx.fail(originOf(expr, "fail"), {
-        message: "fail expects exactly one error type name.",
-      });
-    }
-
-    const success = yield* ctx.freshTVar;
-    const errorName = expr.args[0]!.name;
-    return operationalEffectType(success, [TCon(errorName)], []);
   });
 
 const inferEffectDo = (
@@ -600,9 +587,6 @@ const inferApp = (
     }
     if (expr.fn._tag === "Var" && expr.fn.name === "succeed") {
       return yield* inferOperationalSucceed(env, expr);
-    }
-    if (expr.fn._tag === "Var" && expr.fn.name === "fail" && expr.args[0]?._tag === "Var") {
-      return yield* inferOperationalFail(expr);
     }
     if (expr.fn._tag === "Var" && expr.fn.name === "apply") {
       return yield* inferApply(env, expr);

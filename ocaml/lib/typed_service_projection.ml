@@ -11,7 +11,7 @@ let lower_diagnostics diagnostics =
         diagnostic.message)
     diagnostics
 
-let append_service_requirement service_name type_expr =
+let append_operation_requirement operation_requirement type_expr =
   match type_expr with
   | Core_ast.TEApp
       ( span,
@@ -20,10 +20,12 @@ let append_service_requirement service_name type_expr =
       ) -> (
       match req_callee with
       | Core_ast.TESym (_, "RequirementSet") ->
-          let service_requirement_exists =
+          let operation_requirement_exists =
             List.exists
               (function
-                | Core_ast.TESym (_, name) when name = service_name -> true
+                | Core_ast.TESym (_, name)
+                  when name = operation_requirement ->
+                    true
                 | _ -> false)
               req_args
           in
@@ -39,8 +41,9 @@ let append_service_requirement service_name type_expr =
                        req_callee,
                        req_args
                        @
-                       (if service_requirement_exists then []
-                        else [ Core_ast.TESym (req_span, service_name) ]) );
+                       (if operation_requirement_exists then []
+                        else
+                          [ Core_ast.TESym (req_span, operation_requirement) ]) );
                  ] ))
       | _ ->
           Error
@@ -84,7 +87,8 @@ let parse_method service_name = function
       with
       | Error diagnostics, _ | _, Error diagnostics -> Error diagnostics
       | Ok params, Ok return_type -> (
-          match append_service_requirement service_name return_type with
+          let operation_requirement = service_name ^ "." ^ method_name in
+          match append_operation_requirement operation_requirement return_type with
           | Error _ as error -> error
           | Ok return_type ->
               Ok

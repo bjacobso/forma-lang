@@ -23,13 +23,23 @@ export interface MechanicsRuntime {
 
 export class MechanicsRuntimeError extends Error {
   readonly code: string;
+  readonly errorType: string | undefined;
+  readonly errorValue: MechanicsRuntimeValue | undefined;
   readonly details?: unknown;
 
-  constructor(code: string, message: string, details?: unknown) {
+  constructor(
+    code: string,
+    message: string,
+    details?: unknown,
+    errorType?: string,
+    errorValue?: MechanicsRuntimeValue,
+  ) {
     super(message);
     this.name = "MechanicsRuntimeError";
     this.code = code;
     this.details = details;
+    this.errorType = errorType;
+    this.errorValue = errorValue;
   }
 }
 
@@ -121,7 +131,29 @@ async function evaluateEffect(
       return evaluateValue(node["value"], env, services, invoke);
     case "Fail": {
       const error = await evaluateValue(node["error"], env, services, invoke);
-      throw new MechanicsRuntimeError(failCode(error), "Mechanics operation failed.", { error });
+      const errorType = errorValueType(error);
+      throw new MechanicsRuntimeError(
+        failCode(error),
+        "Mechanics operation failed.",
+        { error },
+        errorType,
+        error,
+      );
+    }
+    case "Catch": {
+      try {
+        return await evaluateEffect(recordField(node, "body"), env, services, invoke);
+      } catch (error) {
+        if (
+          !(error instanceof MechanicsRuntimeError) ||
+          error.errorType !== stringField(node, "errorType")
+        ) {
+          throw error;
+        }
+        const scoped = new Map(env);
+        scoped.set(stringField(node, "binding"), error.errorValue);
+        return evaluateEffect(recordField(node, "handler"), scoped, services, invoke);
+      }
     }
     case "Bind": {
       const value = await evaluateEffect(recordField(node, "value"), env, services, invoke);
@@ -278,6 +310,13 @@ async function evaluateValue(
       }
       return record;
     }
+    case "Error": {
+      const errorType = stringField(value, "errorType");
+      const payload = await evaluateValue(value["payload"], env, services, invoke);
+      return isRecord(payload)
+        ? { _tag: errorType, ...payload }
+        : { _tag: errorType, value: payload };
+    }
     case "Expr":
       return evaluateExprLiteral(value["source"]);
     default:
@@ -382,11 +421,18 @@ function assertRequirementsAvailable(operation: JsonRecord, services: ServiceMap
 
   for (const requirement of arrayField(effect, "requirements")) {
     if (typeof requirement !== "string") continue;
-    if (!services.has(requirement)) {
+    const [serviceName, methodName, ...extra] = requirement.split(".");
+    const operationAvailable =
+      extra.length === 0 &&
+      serviceName !== undefined &&
+      methodName !== undefined &&
+      services.get(serviceName)?.has(methodName);
+    const serviceAvailable = services.has(requirement);
+    if (!operationAvailable && !serviceAvailable) {
       throw new MechanicsRuntimeError(
-        "mechanics/missing-service",
-        `Missing mechanics service: ${requirement}`,
-        { service: requirement },
+        "mechanics/missing-capability",
+        `Missing mechanics capability: ${requirement}`,
+        { capability: requirement },
       );
     }
   }
@@ -412,10 +458,16 @@ async function asyncEvery<T>(
 }
 
 function failCode(error: MechanicsRuntimeValue): string {
+  const errorType = errorValueType(error);
+  if (errorType) return `mechanics/fail/${errorType}`;
   if (typeof error === "string" && /^[A-Za-z][A-Za-z0-9_.-]*$/.test(error)) {
     return `mechanics/fail/${error}`;
   }
   return "mechanics/fail";
+}
+
+function errorValueType(error: MechanicsRuntimeValue): string | undefined {
+  return isRecord(error) && typeof error["_tag"] === "string" ? error["_tag"] : undefined;
 }
 
 function recordKeyString(key: MechanicsRuntimeValue, source: JsonValue | undefined): string {

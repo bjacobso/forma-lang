@@ -161,10 +161,18 @@ and lower_form expr op args =
   | "and" -> lower_and expr args
   | "do" -> lower_sequence (Ast.expr_span expr) args
   | "do!" -> Lower_effect.lower_sequence lower_expr expr args
+  | "fail" -> Lower_effect.lower_fail lower_expr expr args
+  | "catch" -> Lower_effect.lower_catch lower_expr expr args
   | "get" -> lower_get expr args
   | ":" -> lower_ascribe expr args
   | "match" -> Lower_match.lower_match lower_expr expr args
   | "define-type" -> lower_type_def expr args
+  | "define-effect" | "perform" | "handle" | "->!" ->
+      Error
+        [
+          diagnostic ~span:(Ast.expr_span expr) "lower/legacy-effect"
+            "Legacy algebraic effect forms are not supported; use define-service, define-operation, and Effect.";
+        ]
   | _ -> lower_application expr (Ast.Symbol (Ast.expr_span expr, op)) args
 
 and lower_exprs exprs =

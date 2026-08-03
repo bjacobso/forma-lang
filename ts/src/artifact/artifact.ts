@@ -642,6 +642,33 @@ function validateBodyNode(
         );
       }
       break;
+    case "Catch":
+      validateBodyNode(node["body"], `${path}.body`, contractName, declaration, index, diagnostics);
+      expectString(
+        node["errorType"],
+        `${path}.errorType`,
+        contractName,
+        declaration,
+        index,
+        diagnostics,
+      );
+      expectString(
+        node["binding"],
+        `${path}.binding`,
+        contractName,
+        declaration,
+        index,
+        diagnostics,
+      );
+      validateBodyNode(
+        node["handler"],
+        `${path}.handler`,
+        contractName,
+        declaration,
+        index,
+        diagnostics,
+      );
+      break;
     case "ServiceCall":
       expectString(
         node["service"],
@@ -1148,6 +1175,24 @@ function validateValueNode(
       validateRecordEntryArray(
         node["entries"],
         `${path}.entries`,
+        contractName,
+        declaration,
+        index,
+        diagnostics,
+      );
+      break;
+    case "Error":
+      expectString(
+        node["errorType"],
+        `${path}.errorType`,
+        contractName,
+        declaration,
+        index,
+        diagnostics,
+      );
+      validateValueNode(
+        node["payload"],
+        `${path}.payload`,
         contractName,
         declaration,
         index,

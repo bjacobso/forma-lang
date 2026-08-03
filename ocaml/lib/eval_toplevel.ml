@@ -141,13 +141,12 @@ let eval ctx env = function
             "define-payload-contract expects a symbol name followed by payload \
              descriptor clauses.";
         ]
-  | Reader.List (_, Reader.Symbol (_, "define-effect") :: define_effect_args)
-    -> (
-      match Eval_effect.parse_define_effect define_effect_args with
-      | Error _ as error -> error
-      | Ok (name, operations) ->
-          let value = Eval_effect_definition.value name operations in
-          Ok (value, Env.bind name value env))
+  | Reader.List (_, Reader.Symbol (_, "define-effect") :: _) ->
+      Error
+        [
+          diagnostic "eval/legacy-effect"
+            "define-effect is not a public Forma form; use define-service and define-operation.";
+        ]
   | Reader.List
       ( _,
         Reader.Symbol (_, "defmacro")

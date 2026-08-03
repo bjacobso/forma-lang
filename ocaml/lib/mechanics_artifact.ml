@@ -134,12 +134,21 @@ let service_payload name methods =
     ]
 
 let effect_payload name params effect_json body =
+  let capabilities =
+    match effect_json with
+    | Ir_json.Object entries ->
+        Option.value (List.assoc_opt "requirements" entries)
+          ~default:(Ir_json.Array [])
+    | _ -> Ir_json.Array []
+  in
   Ir_json.Object
     [
       ("kind", Ir_json.String "EffectDef");
       ("name", Ir_json.String name);
       ("params", Ir_json.Array params);
       ("effect", effect_json);
+      ( "authority",
+        Ir_json.Object [ ("capabilities", capabilities) ] );
       ("body", body);
     ]
 
@@ -172,6 +181,19 @@ let service_method_effects exprs =
           List.fold_left (collect_method service_name) acc methods
       | _ -> acc)
     [] exprs
+
+let operation_effects signatures =
+  List.filter_map
+    (fun (name, signature) ->
+      match signature with
+      | Ast.List (_, Ast.Symbol (_, "->") :: signature_items)
+        when List.length signature_items >= 2 ->
+          let effect_expr = List.hd (List.rev signature_items) in
+          (match effect_type_to_json effect_expr None with
+          | Ok effect_json -> Some (name, effect_json)
+          | Error _ -> None)
+      | _ -> None)
+    signatures
 
 let packageable ~source_id ~form_index ~span kind name payload =
   let declaration =
@@ -306,7 +328,7 @@ let declaration ~source_id ~form_index signatures service_effects = function
 
 let declarations ~source_id exprs =
   let signatures = operation_signatures exprs in
-  let service_effects = service_method_effects exprs in
+  let service_effects = service_method_effects exprs @ operation_effects signatures in
   let rec loop acc form_index = function
     | [] -> Ok (List.rev acc)
     | expr :: rest when is_mechanics_form expr -> (

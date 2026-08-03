@@ -23,12 +23,12 @@ alternative for artifact size but loses the type-theory fit.
 failing on scope, drag, or diagnostic quality. Or Wasm artifact size
 staying above the 8 MB gzipped budget after targeted effort.
 
-## 2. Elaboration-time handlers over row-polymorphic effects
+## 2. Closed operational effects over row-polymorphic handlers
 
-**Chosen:** the shipping effect substrate is elaboration-time
-capability resolution. `!`-suffix calls desugar to capability record
-field access. `raise!` / `catch*` desugar to host try/catch.
-Typechecking is plain Hindley-Milner.
+**Chosen:** the shipping effect contract is `Effect<A,E,R>`, where `E` and
+`R` are normalized closed finite sets. Services expose operation-granular
+capabilities, operations lower to portable IR, and typed `catch` removes the
+error it handles. Typechecking remains Hindley-Milner without open rows.
 
 **Considered:** full row-polymorphic algebraic effects with runtime
 continuation capture, in the style of Koka or Eff.
@@ -36,20 +36,12 @@ continuation capture, in the style of Koka or Eff.
 **Why:** row-polymorphic effects are powerful but expensive. They
 require row unification (a distinct type-theoretic mechanism on top of
 HM) and runtime continuation capture (delimited continuations or CPS
-transformation in every target backend). The workloads that motivate
-onlang — handler sets installed at process boundary, no multi-shot
-continuations, no row-polymorphic reuse — do not need any of that.
-Elaboration-time handlers give the same authoring surface and the
-same diagnostic quality for roughly one-tenth the implementation
-cost.
-
-The surface syntax is identical between the two substrates. If a
-future workload genuinely requires dynamic handlers or multi-shot
-continuations, the row-polymorphic substrate can be adopted without
-changing any DSL surface; only the elaboration target changes. A fresh
-design pass would be required if that future arrives; the old row-effect spike
-has been removed now that mainline Lisp mechanics own the relevant effect
-contracts and diagnostics.
+transformation in every target backend). Current workloads install service
+implementations at the runtime boundary and do not require continuation
+capture or row-polymorphic reuse. Portable IR, rather than Effect-TS or OCaml
+effects, defines the execution semantics. `define-effect`, `perform`, `handle`,
+and `->!` are quarantined legacy syntax; the OCaml 5 handler used by the host
+ABI is an internal mechanism.
 
 **What would reopen it:** a real workload requiring dynamic handler
 installation that depends on runtime values, multi-shot continuations,

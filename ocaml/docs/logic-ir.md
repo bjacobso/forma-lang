@@ -75,14 +75,16 @@ Call                pure function call
 CapabilityCall      host/runtime operation, for example log! or query-one!
 Construct           record / variant / schema-shaped value
 FieldGet            record field access
-Raise               typed error construction
-Try                 local error recovery
+Error               schema-backed typed error value
+Fail                terminate with a typed error value
+Catch               recover one named error and bind its payload
 Return              explicit return boundary, when useful for handlers
 ```
 
-Capability calls are the important boundary. They represent effectful
-operations without requiring every backend to implement resumable effect
-handlers.
+Capability calls are operation-granular (for example,
+`EmployeeStore.find`). They represent effectful operations without requiring
+every backend to implement resumable effect handlers. `Fail` and `Catch` keep
+typed recovery explicit and portable.
 
 ```json
 {

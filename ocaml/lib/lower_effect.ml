@@ -85,6 +85,40 @@ let lower_sequence lower_expr expr args =
             "do! expects a binding vector and one or more body forms.";
         ]
 
+let lower_fail lower_expr expr = function
+  | [ Ast.List (_, [ Ast.Symbol (_, error_name); payload ]) ] -> (
+      match lower_expr payload with
+      | Error _ as error -> error
+      | Ok payload ->
+          Ok
+            (Core_ast.EffectFail
+               (Core_ast.node (Ast.expr_span expr), error_name, payload)))
+  | _ ->
+      Error
+        [
+          diagnostic ~span:(Ast.expr_span expr) "lower/effect-fail"
+            "fail expects a constructed error value: (fail (ErrorName payload)).";
+        ]
+
+let lower_catch lower_expr expr = function
+  | [ body; Ast.List (_, [ Ast.Symbol (_, error_name); Ast.Symbol (binding_span, binding_name) ]); handler ] -> (
+      match (lower_expr body, lower_expr handler) with
+      | Error diagnostics, _ | _, Error diagnostics -> Error diagnostics
+      | Ok body, Ok handler ->
+          Ok
+            (Core_ast.EffectCatch
+               ( Core_ast.node (Ast.expr_span expr),
+                 body,
+                 error_name,
+                 Core_ast.{ node = Core_ast.node binding_span; name = binding_name },
+                 handler )))
+  | _ ->
+      Error
+        [
+          diagnostic ~span:(Ast.expr_span expr) "lower/effect-catch"
+            "catch expects (catch effect (ErrorName binding) handler).";
+        ]
+
 let lower_let lower_expr lower_body expr bindings body =
   let rec loop = function
     | [] -> lower_body (Ast.expr_span expr) body

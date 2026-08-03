@@ -351,7 +351,7 @@ let rec type_expr_to_json expr =
                 (head ^ " type expects one argument.") ]
   | _ -> schema_expr_to_json expr
 
-and effect_type_to_json expr service_requirement =
+and effect_type_to_json expr operation_requirement =
   match expr with
   | Ast.List
       ( _,
@@ -372,9 +372,10 @@ and effect_type_to_json expr service_requirement =
           Error diagnostics
       | (Ok success, Ok errors, Ok requirements) ->
           let requirements =
-            match service_requirement with
-            | Some service_name when not (List.mem service_name requirements) ->
-                requirements @ [ service_name ]
+            match operation_requirement with
+            | Some operation_requirement
+              when not (List.mem operation_requirement requirements) ->
+                requirements @ [ operation_requirement ]
             | _ -> requirements
           in
           Ok
@@ -400,7 +401,8 @@ and symbolic_set_to_json label exprs =
     | [] -> Ok (List.rev acc)
     | expr :: rest -> (
       match scalar_name expr with
-      | Some name -> loop (name :: acc) rest
+      | Some name ->
+          if List.mem name acc then loop acc rest else loop (name :: acc) rest
       | None ->
           Error
             [
@@ -449,7 +451,8 @@ let method_to_json service_name = function
     match method_params_to_json params_expr with
     | Error _ as error -> error
     | Ok params -> (
-      match effect_type_to_json return_expr (Some service_name) with
+      let operation_requirement = service_name ^ "." ^ method_name in
+      match effect_type_to_json return_expr (Some operation_requirement) with
       | Error _ as error -> error
       | Ok effect_json ->
           Ok

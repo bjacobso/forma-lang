@@ -113,7 +113,10 @@ function parseServiceMethod(
 
   const methodName = asSym(items[0]!, "service method name");
   const paramTypes = parseServiceMethodParamTypes(items[1]!);
-  const returnType = appendServiceRequirement(serviceName, parseTypeExpr(items[2]!));
+  const returnType = appendServiceRequirement(
+    `${serviceName}.${methodName}`,
+    parseTypeExpr(items[2]!),
+  );
   return {
     name: methodName,
     typeExpr: TEFun(spanOf(expr), paramTypes, returnType),
@@ -136,7 +139,7 @@ function parseServiceMethodParamTypes(expr: SExpr): readonly TypeExpr[] {
   return params;
 }
 
-function appendServiceRequirement(serviceName: string, typeExpr: TypeExpr): TypeExpr {
+function appendServiceRequirement(operationRequirement: string, typeExpr: TypeExpr): TypeExpr {
   if (
     typeExpr._tag !== "TEApp" ||
     typeExpr.con._tag !== "TESym" ||
@@ -162,15 +165,17 @@ function appendServiceRequirement(serviceName: string, typeExpr: TypeExpr): Type
     });
   }
 
-  const serviceRequirementExists = requirements.args.some(
-    (requirement) => requirement._tag === "TESym" && requirement.name === serviceName,
+  const operationRequirementExists = requirements.args.some(
+    (requirement) => requirement._tag === "TESym" && requirement.name === operationRequirement,
   );
   return TEApp(typeExpr.span, typeExpr.con, [
     success,
     errors,
     TEApp(requirements.span, requirements.con, [
       ...requirements.args,
-      ...(serviceRequirementExists ? [] : [TESym(requirements.span, serviceName)]),
+      ...(operationRequirementExists
+        ? []
+        : [TESym(requirements.span, operationRequirement)]),
     ]),
   ]);
 }

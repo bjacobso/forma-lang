@@ -43,16 +43,16 @@ the source-level type environment or do not have a standalone core form:
 - `define-elaboration-primitive`
 - `define-payload-contract`
 - `defmacro` and `define-macro`
-- legacy/ascription pairs like `(: symbol Type)` followed by the bound form
-- effect type annotations and `define-effect`
+- ascription pairs like `(: symbol Type)` followed by the bound form
+- `define-error` and `define-service`, which extend the type environment
 
 `typecheck` also owns AST-aware warnings that should not be duplicated in
 typed-core: keyword literal warnings and simple ADT match coverage warnings.
 
 ## ABI Policy Hook
 
-The host ABI's `typePolicy.unboundSymbols` option is applied before effect
-registry collection and before the `Typed_toplevel` pass. It only creates
+The host ABI's `typePolicy.unboundSymbols` option is applied before the
+`Typed_toplevel` pass. It only creates
 bindings for symbols that are not already present in the current type
 environment. Supported match patterns are:
 

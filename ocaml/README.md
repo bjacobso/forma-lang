@@ -1,4 +1,4 @@
-# onlang
+# Forma
 
 A typed Lisp built to host domain DSLs. Homoiconic, macro-first,
 compiled via OCaml to native, JavaScript, and WebAssembly.
@@ -8,17 +8,16 @@ on it is not.
 
 ## What It Is
 
-onlang takes the parts of Clojure most users agree were right —
+Forma takes the parts of Clojure most users agree were right —
 immutable data, macros, REPL — and integrates three things Clojure
 users have spent a decade patching in from the outside:
 
 - **A real type system.** Bidirectional elaboration with typed macros.
   Errors point at the source form the author wrote, not at the
   expanded shape.
-- **An effect system.** `!`-suffixed operations resolve to handlers
-  in scope at elaboration time. Type system stays plain
-  Hindley-Milner; effect calls become direct function calls after
-  expand.
+- **An operational effect contract.** `Effect<A,E,R>` tracks success,
+  schema-backed errors, and operation-granular capabilities as closed finite
+  sets. Programs lower to portable IR; runtime libraries are adapters.
 - **Elaborator reflection.** Host programs register descriptors and
   meta hooks that participate in elaboration. Domain vocabulary
   (`define-entity`, `define-api-group`) is preludes, not built-ins.

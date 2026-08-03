@@ -430,80 +430,41 @@ let evaluate_source ~with_session (request : request) =
         exprs)
 
 let typecheck_source ~with_session (request : request) =
-  let typecheck_exprs ?source_text type_env eval_env exprs =
+  let typecheck_exprs type_env eval_env exprs =
     match expand_exprs eval_env exprs with
     | Error diagnostics -> Response.eval_diagnostics_json diagnostics
     | Ok expanded -> (
         let base_env = Option.value type_env ~default:[] in
         match Abi_type_policy.apply request base_env expanded with
         | Error diagnostics -> Response.typecheck_diagnostics_json diagnostics
-        | Ok base_env -> (
-            match
-              Abi_effect_typecheck.collect_effect_registry base_env expanded
-            with
+        | Ok type_env ->
+            let extra_diagnostics = collect_match_warning_jsons expanded in
+            let result =
+              match request.result with
+              | Some "per-expression" ->
+                  Typecheck.typecheck_program_with_env_all type_env expanded
+                  |> Result.map (fun (expression_types, typ, _env) ->
+                      (typ, expression_types))
+              | _ ->
+                  Typecheck.typecheck_program_with_env type_env expanded
+                  |> Result.map (fun (typ, _env) -> (typ, []))
+            in
+            match result with
             | Error diagnostics ->
                 Response.typecheck_diagnostics_json diagnostics
-            | Ok effect_registry -> (
-                let effect_warnings, effect_errors =
-                  Abi_effect_typecheck.collect_effect_typecheck_diagnostics
-                    ?source_text effect_registry expanded
-                in
-                if effect_errors <> [] then
-                  Response.typecheck_diagnostics_json effect_errors
-                else
-                  let extra_diagnostics =
-                    collect_match_warning_jsons expanded @ effect_warnings
-                  in
-                  let rewritten =
-                    Abi_effect_typecheck.rewrite_effect_exprs exprs
-                  in
-                  let result =
-                    let type_env =
-                      Abi_effect_typecheck.registry_env effect_registry
-                    in
-                    match request.result with
-                    | Some "per-expression" ->
-                        Typecheck.typecheck_program_with_env_all type_env
-                          rewritten
-                        |> Result.map (fun (expression_types, typ, _env) ->
-                            (typ, expression_types))
-                    | _ ->
-                        Typecheck.typecheck_program_with_env type_env rewritten
-                        |> Result.map (fun (typ, _env) -> (typ, []))
-                  in
-                  match result with
-                  | Error diagnostics ->
-                      Response.typecheck_diagnostics_json diagnostics
-                  | Ok (typ, expression_types) ->
-                      let typ =
-                        match source_text with
-                        | Some source_text -> (
-                            match
-                              Abi_effect_typecheck.annotated_result_type_string
-                                ~source_text exprs typ
-                            with
-                            | Some annotated -> annotated
-                            | None -> typ)
-                        | None -> typ
-                      in
-                      Abi_typecheck_response.success_json request typ rewritten
-                        extra_diagnostics ~expression_types)))
+            | Ok (typ, expression_types) ->
+                Abi_typecheck_response.success_json request typ expanded
+                  extra_diagnostics ~expression_types)
   in
   match (request.source, request.session_id, request.source_id) with
   | Some source, Some session_id, _ ->
-      let rewritten_source =
-        Abi_effect_typecheck.preprocess_effect_type_source source
-      in
-      parse_ast_text request rewritten_source (fun exprs ->
+      parse_ast_text request source (fun exprs ->
           with_session (Some session_id) (fun session ->
-              typecheck_exprs ~source_text:source
-                (Some session.Session.type_env) (Some session.Session.env) exprs))
+              typecheck_exprs (Some session.Session.type_env)
+                (Some session.Session.env) exprs))
   | Some source, None, _ ->
-      let rewritten_source =
-        Abi_effect_typecheck.preprocess_effect_type_source source
-      in
-      parse_ast_text request rewritten_source (fun exprs ->
-          typecheck_exprs ~source_text:source None None exprs)
+      parse_ast_text request source (fun exprs ->
+          typecheck_exprs None None exprs)
   | None, Some session_id, Some source_id ->
       with_session (Some session_id) (fun session ->
           match Hashtbl.find_opt session.Session.parsed_sources source_id with

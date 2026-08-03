@@ -50,14 +50,16 @@ let rec infer_expr env expr =
         infer_lambda env params rest_param body
     | Core_ast.App (_, Core_ast.Var (_, "succeed"), args) ->
         infer_operational_succeed env args
-    | Core_ast.App (node, Core_ast.Var (_, "fail"), args) ->
-        infer_operational_fail env node.Core_ast.span args
     | Core_ast.App (node, Core_ast.Var (_, op), args) ->
         infer_typeclass_named_application env node.Core_ast.span op args
     | Core_ast.App (_, callee, args) ->
         Typed_apply.infer_application Typed_apply.{ infer_expr } env callee args
     | Core_ast.Let (_, bindings, body) -> infer_let env bindings body
     | Core_ast.EffectDo (_, bindings, body) -> infer_effect_do env bindings body
+    | Core_ast.EffectFail (node, error_name, payload) ->
+        infer_effect_fail env node.span error_name payload
+    | Core_ast.EffectCatch (node, body, error_name, binding, handler) ->
+        infer_effect_catch env node.span body error_name binding handler
     | Core_ast.If (_, condition, consequent, alternate) ->
         infer_if env condition consequent alternate
     | Core_ast.Def (_, name, signature, value) ->
@@ -244,15 +246,100 @@ and infer_operational_succeed env = function
             "succeed expects exactly one value.";
         ]
 
-and infer_operational_fail _env span = function
-  | [ Core_ast.Var (_, error_name) ] ->
-      Ok ([], effect_type (fresh_tyvar ()) [ TNamed error_name ] [])
-  | _ ->
+and infer_effect_fail env span error_name payload =
+  match Type_env.lookup error_name env with
+  | None ->
       Error
         [
           Type_diagnostic.make ~span "typecheck/effect-fail"
-            "fail expects exactly one error type name.";
+            (Printf.sprintf "Unknown error type %s." error_name);
         ]
+  | Some expected_payload -> (
+      match infer_expr env payload with
+      | Error _ as error -> error
+      | Ok (payload_subst, payload_ty) -> (
+          let expected_payload = apply_subst payload_subst expected_payload in
+          let payload_ty = apply_subst payload_subst payload_ty in
+          match unify expected_payload payload_ty with
+          | Error _ as error -> error
+          | Ok unify_subst ->
+              let subst = compose_subst unify_subst payload_subst in
+              Ok
+                ( subst,
+                  effect_type (fresh_tyvar ()) [ TNamed error_name ] [] )))
+
+and infer_effect_catch env span body error_name binding handler =
+  match infer_expr env body with
+  | Error _ as error -> error
+  | Ok (body_subst, body_ty) -> (
+      let body_ty = apply_subst body_subst body_ty in
+      match effect_parts body_ty with
+      | None ->
+          Error
+            [
+              Type_diagnostic.make ~span "typecheck/effect-catch"
+                (Printf.sprintf "catch expects Effect, received %s."
+                   (ty_to_string body_ty));
+            ]
+      | Some (body_success, body_errors, body_requirements) ->
+          let handles_error =
+            List.exists
+              (function TNamed name -> String.equal name error_name | _ -> false)
+              body_errors
+          in
+          if not handles_error then
+            Error
+              [
+                Type_diagnostic.make ~span "typecheck/effect-catch"
+                  (Printf.sprintf "Impossible catch: %s is not in %s."
+                     error_name (ty_to_string body_ty));
+              ]
+          else
+            match Type_env.lookup error_name env with
+            | None ->
+                Error
+                  [
+                    Type_diagnostic.make ~span "typecheck/effect-catch"
+                      (Printf.sprintf "Unknown error type %s." error_name);
+                  ]
+            | Some error_payload -> (
+                let handler_env =
+                  Type_env.bind binding.Core_ast.name
+                    (Forall
+                       ( [],
+                         apply_subst body_subst error_payload,
+                         [],
+                         Plain ))
+                    (apply_subst_env body_subst env)
+                in
+                match infer_expr handler_env handler with
+                | Error _ as error -> error
+                | Ok (handler_subst, handler_ty) ->
+                    let subst = compose_subst handler_subst body_subst in
+                    let handler_ty = apply_subst subst handler_ty in
+                    let handler_success, handler_errors, handler_requirements =
+                      match effect_parts handler_ty with
+                      | Some parts -> parts
+                      | None -> (handler_ty, [], [])
+                    in
+                    let body_success = apply_subst subst body_success in
+                    (match unify body_success handler_success with
+                    | Error _ as error -> error
+                    | Ok result_subst ->
+                        let subst = compose_subst result_subst subst in
+                        let remaining_errors =
+                          List.filter
+                            (function
+                              | TNamed name -> not (String.equal name error_name)
+                              | _ -> true)
+                            body_errors
+                        in
+                        Ok
+                          ( subst,
+                            effect_type (apply_subst subst body_success)
+                              (merge_type_sets remaining_errors handler_errors)
+                              (merge_type_sets body_requirements
+                                 handler_requirements) ))))
 
 and infer_effect_do env bindings body =
   let rec loop subst env errors requirements = function

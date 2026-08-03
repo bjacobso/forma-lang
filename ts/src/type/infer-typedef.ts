@@ -40,6 +40,9 @@ export const inferTypeDef = (
         next.set(expr.name, expr.typeExpr!);
         return next;
       });
+      if (expr.source === "error") {
+        yield* Ref.update(ctx.errorTypes, (names) => new Set(names).add(expr.name));
+      }
       return tNil;
     }
 

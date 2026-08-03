@@ -36,6 +36,8 @@ and expr =
   | App of node * expr * expr list
   | Let of node * binding list * expr
   | EffectDo of node * binding list * expr
+  | EffectFail of node * string * expr
+  | EffectCatch of node * expr * string * param * expr
   | If of node * expr * expr * expr
   | Record of node * field list
   | Get of node * expr * string
@@ -62,6 +64,8 @@ let expr_node = function
   | App (node, _, _)
   | Let (node, _, _)
   | EffectDo (node, _, _)
+  | EffectFail (node, _, _)
+  | EffectCatch (node, _, _, _, _)
   | If (node, _, _, _)
   | Record (node, _)
   | Get (node, _, _)
@@ -196,6 +200,20 @@ let rec expr_to_json expr =
         [
           field_json "bindings" (list_json binding_to_json bindings);
           field_json "body" (expr_to_json body);
+        ]
+  | EffectFail (_, error_name, payload) ->
+      base "effect-fail"
+        [
+          string_field_json "errorName" error_name;
+          field_json "payload" (expr_to_json payload);
+        ]
+  | EffectCatch (_, body, error_name, binding, handler) ->
+      base "effect-catch"
+        [
+          field_json "body" (expr_to_json body);
+          string_field_json "errorName" error_name;
+          field_json "binding" (param_to_json binding);
+          field_json "handler" (expr_to_json handler);
         ]
   | If (_, condition, consequent, alternate) ->
       base "if"

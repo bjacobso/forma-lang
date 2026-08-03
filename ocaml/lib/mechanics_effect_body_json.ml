@@ -99,6 +99,18 @@ let service_and_method name =
       Some (service, method_name)
   | _ -> None
 
+let error_value_json source_id expr =
+  match expr with
+  | Ast.List (_, [ Ast.Symbol (_, error_type); payload ]) ->
+      Ir_json.Object
+        [
+          ("kind", Ir_json.String "Error");
+          ("errorType", Ir_json.String error_type);
+          ("payload", var_or_literal_json source_id payload);
+          ("span", source_json source_id expr);
+        ]
+  | expr -> var_or_literal_json source_id expr
+
 let rec effect_core_json source_id service_effects effect_json expr =
   match expr with
   | Ast.List (_, Ast.Symbol (_, head) :: args) -> (
@@ -117,6 +129,17 @@ let rec effect_core_json source_id service_effects effect_json expr =
             ("span", source_json source_id expr);
           ]
     | None -> (
+      match List.assoc_opt head service_effects with
+      | Some call_effect ->
+          Ir_json.Object
+            [
+              ("kind", Ir_json.String "OperationCall");
+              ("operation", Ir_json.String head);
+              ("args", Ir_json.Array (List.map (var_or_literal_json source_id) args));
+              ("effect", call_effect);
+              ("span", source_json source_id expr);
+            ]
+      | None -> (
       match head with
       | "succeed" ->
           let value =
@@ -134,10 +157,7 @@ let rec effect_core_json source_id service_effects effect_json expr =
       | "fail" ->
           let error =
             match args with
-            | value :: _ -> (
-              match scalar_name value with
-              | Some name -> Ir_json.String name
-              | None -> var_or_literal_json source_id value)
+            | value :: _ -> error_value_json source_id value
             | [] -> Ir_json.Null
           in
           Ir_json.Object
@@ -176,10 +196,12 @@ let rec effect_core_json source_id service_effects effect_json expr =
       | "when" -> effect_when_json source_id service_effects effect_json expr args
       | "unless" -> effect_unless_json source_id service_effects effect_json expr args
       | "cond" -> effect_cond_json source_id service_effects effect_json expr args
+      | "catch" ->
+          effect_catch_json source_id service_effects effect_json expr args
       | "do!" -> effect_do_json source_id service_effects effect_json expr args
       | "let" -> effect_let_json source_id service_effects effect_json expr args
       | "match" -> effect_match_json source_id service_effects effect_json expr args
-      | _ -> pure_effect_json source_id effect_json expr))
+      | _ -> pure_effect_json source_id effect_json expr)))
   | _ -> pure_effect_json source_id effect_json expr
 
 and pure_effect_json source_id effect_json expr =
@@ -190,6 +212,30 @@ and pure_effect_json source_id effect_json expr =
       ("effect", effect_json);
       ("span", source_json source_id expr);
     ]
+
+and effect_catch_json source_id service_effects effect_json expr = function
+  | body
+    :: Ast.List
+         (_, [ Ast.Symbol (_, error_type); Ast.Symbol (_, binding) ])
+    :: handler :: _ ->
+      Ir_json.Object
+        [
+          ("kind", Ir_json.String "Catch");
+          ("body", effect_core_json source_id service_effects effect_json body);
+          ("errorType", Ir_json.String error_type);
+          ("binding", Ir_json.String binding);
+          ( "handler",
+            effect_core_json source_id service_effects effect_json handler );
+          ("effect", effect_json);
+          ("span", source_json source_id expr);
+        ]
+  | _ ->
+      Ir_json.Object
+        [
+          ("kind", Ir_json.String "Catch");
+          ("effect", effect_json);
+          ("span", source_json source_id expr);
+        ]
 
 and effect_if_json source_id service_effects effect_json expr = function
   | condition :: then_expr :: else_expr :: _ ->

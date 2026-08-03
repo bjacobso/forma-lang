@@ -28,3 +28,9 @@ The CPS flags intentionally increase JS/Wasm output size and cold startup. The
 architecture gate ratchets JS gzip size, Wasm gzip size, Wasm startup, and
 cross-target eval latency so future compiler or stdlib updates cannot inflate
 those costs unnoticed.
+
+This is an engine implementation detail, not the public Forma effect
+language. Public programs use services, operations, `Effect<A,E,R>`, and typed
+`catch`; portable logic/mechanics IR defines their semantics. The legacy
+`define-effect`, `perform`, and `handle` source forms are not enabled by this
+target support.

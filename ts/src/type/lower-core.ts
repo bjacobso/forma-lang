@@ -83,6 +83,8 @@ import {
   lowerMatch,
   lowerGet,
   lowerAscribe,
+  lowerEffectFail,
+  lowerEffectCatch,
 } from "./lower-control.js";
 import {
   lowerTypeDef,
@@ -184,6 +186,10 @@ function lowerList(expr: SExpr & { _tag: "List" }): CoreExpr {
         return lowerDo(lower, span, items);
       case "do!":
         return lowerEffectDo(lower, span, items);
+      case "fail":
+        return lowerEffectFail(lower, span, items);
+      case "catch":
+        return lowerEffectCatch(lower, span, items);
       case "get":
         return lowerGet(lower, span, items);
       case ":":

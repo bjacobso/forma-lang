@@ -36,6 +36,8 @@ and expr =
   | App of node * expr * expr list
   | Let of node * binding list * expr
   | EffectDo of node * binding list * expr
+  | EffectFail of node * string * expr
+  | EffectCatch of node * expr * string * param * expr
   | If of node * expr * expr * expr
   | Record of node * field list
   | Get of node * expr * string

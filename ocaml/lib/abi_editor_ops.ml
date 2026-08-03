@@ -90,7 +90,8 @@ let definition_of_expr env uri = function
             (( "define" | "def" | "defn" | "defmacro" | "define-macro"
              | "define-form" | "meta-fn" | "define-elaboration"
              | "define-elaboration-primitive" | "define-protocol"
-             | "define-payload-contract" | "define-effect" | "define-type" ) as
+             | "define-payload-contract" | "define-service" | "define-error"
+             | "define-operation" | "define-type" ) as
              detail) )
         :: binding :: _ ) -> (
       match binding_name_and_span binding with
@@ -128,7 +129,9 @@ let builtin_completion_labels =
     "unquote";
     "define-type";
     "define-form";
-    "define-effect";
+    "define-service";
+    "define-operation";
+    "define-error";
     "define-protocol";
     "define-elaboration";
     "meta-fn";
