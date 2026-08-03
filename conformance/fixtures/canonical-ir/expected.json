@@ -1,0 +1,124 @@
+{
+  "normalized": {
+    "artifacts": [
+      {
+        "content": {
+          "declarationCount": 5,
+          "declarations": [
+            {
+              "fields": [
+                {
+                  "name": "department/name",
+                  "required": "true",
+                  "type": "String"
+                }
+              ],
+              "kind": "Entity",
+              "name": "Department"
+            },
+            {
+              "fields": [
+                {
+                  "name": "employee/name",
+                  "required": "true",
+                  "type": "String"
+                },
+                {
+                  "name": "employee/department",
+                  "required": null,
+                  "type": ["Ref", "Department"]
+                },
+                {
+                  "name": "employee/active",
+                  "required": null,
+                  "type": "Bool"
+                }
+              ],
+              "kind": "Entity",
+              "name": "Employee"
+            },
+            {
+              "from": "Employee",
+              "kind": "Query",
+              "name": "employee-directory",
+              "select": ["employee/name", "employee/department"],
+              "where": "employee/active"
+            },
+            {
+              "entity": "Department",
+              "fields": {
+                "department/name": "Platform"
+              },
+              "id": "department:platform",
+              "kind": "Record"
+            },
+            {
+              "entity": "Employee",
+              "fields": {
+                "employee/department": "department:platform",
+                "employee/name": "Ada Lovelace"
+              },
+              "id": "employee:ada",
+              "kind": "Record"
+            }
+          ],
+          "modules": [
+            {
+              "declarations": [
+                {
+                  "canonicalName": "emit/canonical-schema/Department",
+                  "kind": "Entity",
+                  "localName": "Department"
+                },
+                {
+                  "canonicalName": "emit/canonical-schema/Employee",
+                  "kind": "Entity",
+                  "localName": "Employee"
+                },
+                {
+                  "canonicalName": "emit/canonical-schema/employee-directory",
+                  "kind": "Query",
+                  "localName": "employee-directory"
+                }
+              ],
+              "diagnostics": [],
+              "exports": [],
+              "imports": [],
+              "moduleId": "emit/canonical-schema",
+              "publicExportHash": "d7b5cbd0e6567799a0e1a5ee942109f1c809f04ef0e2737234a2c107f0cefa91",
+              "reExports": [],
+              "sourcePath": "emit/canonical-schema",
+              "usedPreludes": []
+            },
+            {
+              "declarations": [
+                {
+                  "canonicalName": "emit/canonical-data/department:platform",
+                  "kind": "Record",
+                  "localName": "department:platform"
+                },
+                {
+                  "canonicalName": "emit/canonical-data/employee:ada",
+                  "kind": "Record",
+                  "localName": "employee:ada"
+                }
+              ],
+              "diagnostics": [],
+              "exports": [],
+              "imports": [],
+              "moduleId": "emit/canonical-data",
+              "publicExportHash": "d7b5cbd0e6567799a0e1a5ee942109f1c809f04ef0e2737234a2c107f0cefa91",
+              "reExports": [],
+              "sourcePath": "emit/canonical-data",
+              "usedPreludes": []
+            }
+          ]
+        },
+        "mediaType": "application/vnd.forma.ir+json",
+        "name": "ir.json"
+      }
+    ],
+    "backend": "canonical-ir"
+  },
+  "success": true
+}

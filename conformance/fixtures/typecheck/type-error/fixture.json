@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck type error",
+  "category": "typecheck",
+  "sourceId": "parity/type-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "diagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

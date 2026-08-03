@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck saturated arity mismatch error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-arity-mismatch-saturated-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

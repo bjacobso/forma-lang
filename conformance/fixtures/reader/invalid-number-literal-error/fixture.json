@@ -1,0 +1,17 @@
+{
+  "name": "Reader invalid number literal error",
+  "category": "reader",
+  "sourceId": "parity/reader-invalid-number-literal-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "parseDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

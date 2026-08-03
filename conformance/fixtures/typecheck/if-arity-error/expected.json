@@ -1,0 +1,11 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/arity",
+        "message": "Arity mismatch."
+      }
+    ]
+  },
+  "success": false
+}

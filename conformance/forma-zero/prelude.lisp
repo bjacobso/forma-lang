@@ -1,6 +1,6 @@
 ; forma-zero prelude
 ; -----------------------------------------------------------------------------
-; The Forma Zero kernel from specs/vision/forma-zero.md, written in the shared
+; The portable Forma kernel described in docs/language.md, written in the shared
 ; Forma dialect so the same source runs on @forma/ts (dynamic) and
 ; @forma/ocaml (HM-typechecked).
 ;

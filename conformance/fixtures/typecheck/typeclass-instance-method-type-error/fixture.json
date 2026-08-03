@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck typeclass instance method type error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-typeclass-instance-method-type-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "diagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

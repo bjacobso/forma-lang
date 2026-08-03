@@ -1,0 +1,1 @@
+((fn [& xs] (count xs)))

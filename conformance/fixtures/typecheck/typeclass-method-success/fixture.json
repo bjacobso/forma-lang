@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck typeclass method success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-typeclass-method-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

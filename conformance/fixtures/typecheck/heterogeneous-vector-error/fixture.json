@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck heterogeneous vector error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-heterogeneous-vector-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

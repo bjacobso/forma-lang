@@ -1,0 +1,60 @@
+{
+  "name": "Canonical IR artifact emission",
+  "category": "emit",
+  "sourceId": "emit/canonical-schema",
+  "source": {
+    "file": "schema.lisp"
+  },
+  "preludes": [
+    {
+      "kind": "prelude",
+      "sourceId": "preludes/kernel.lisp",
+      "text": {
+        "repoFile": "preludes/kernel.lisp"
+      }
+    },
+    {
+      "kind": "prelude",
+      "sourceId": "preludes/compiler.lisp",
+      "text": {
+        "repoFile": "preludes/compiler.lisp"
+      }
+    },
+    {
+      "kind": "prelude",
+      "sourceId": "preludes/ontology.lisp",
+      "text": {
+        "repoFile": "preludes/ontology.lisp"
+      }
+    },
+    {
+      "kind": "prelude",
+      "sourceId": "preludes/ontology-compiler.lisp",
+      "text": {
+        "repoFile": "preludes/ontology-compiler.lisp"
+      }
+    }
+  ],
+  "setup": {
+    "sessionInputs": [
+      {
+        "kind": "source",
+        "sourceId": "emit/canonical-data",
+        "text": {
+          "file": "data.lisp"
+        }
+      }
+    ]
+  },
+  "operation": {
+    "kind": "emit",
+    "backend": "canonical-ir",
+    "sourceIds": ["emit/canonical-schema", "emit/canonical-data"]
+  },
+  "comparison": {
+    "mode": "artifact"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

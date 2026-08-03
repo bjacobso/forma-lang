@@ -1,0 +1,11 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/form-shape",
+        "message": "Invalid special form."
+      }
+    ]
+  },
+  "success": false
+}

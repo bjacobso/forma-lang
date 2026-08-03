@@ -1,0 +1,17 @@
+{
+  "name": "Reader bad string escape error",
+  "category": "reader",
+  "sourceId": "parity/reader-bad-string-escape-error",
+  "source": {
+    "inline": "\"abc\\"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "parseDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

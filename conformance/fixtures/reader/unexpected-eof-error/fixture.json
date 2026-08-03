@@ -1,0 +1,17 @@
+{
+  "name": "Reader unexpected EOF error",
+  "category": "reader",
+  "sourceId": "parity/reader-unexpected-eof-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "parseDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

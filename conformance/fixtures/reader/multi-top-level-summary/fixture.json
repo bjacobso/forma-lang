@@ -1,0 +1,17 @@
+{
+  "name": "Reader multi top level summary",
+  "category": "reader",
+  "sourceId": "parity/reader-multi-top-level-summary",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "summary"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

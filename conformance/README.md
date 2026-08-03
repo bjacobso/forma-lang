@@ -2,8 +2,8 @@
 
 Shared, implementation-neutral fixtures exercised by **both** Forma engines:
 
-- `@forma/ts` — `packages/@forma/ts/test/forma-zero.test.ts` (vitest)
-- `@forma/ocaml` — `packages/@forma/ocaml/scripts/forma-zero.mjs` (daemon ABI;
+- `@forma/ts` — `packages/ts/test/forma-zero.test.ts` (vitest)
+- `@forma/ocaml` — `packages/ocaml/scripts/forma-zero.mjs` (daemon ABI;
   wired into `test:ocaml` and runnable alone via `pnpm --filter @forma/ocaml forma-zero`)
 
 A suite is a directory containing:
@@ -13,6 +13,11 @@ A suite is a directory containing:
   evaluating to a **scalar** (string, int, or bool) so result comparison never
   depends on either engine's collection encoding;
 - `expected.json` — `name → { kind: "string" | "int" | "bool", value }`.
+
+`fixtures/` contains the larger reader, typechecker, and canonical-artifact
+corpora used by the native implementation. The Markdown programs in
+`../examples` and the language definitions in `../preludes` complete the
+cross-target corpus.
 
 ## The shared dialect (discovered, not designed)
 
@@ -48,9 +53,9 @@ several item types).
 
 ## forma-zero
 
-Executes the kernel of [`specs/vision/forma-zero.md`](../../../specs/vision/forma-zero.md)
-— unification → `where`/`without` → the derived primitives → `opeval`, the
-admission loop — and checks the behaviors the doc claims, layer by layer:
+Executes the smallest portable operational kernel — unification →
+`where`/`without` → the derived primitives → `opeval`, the admission loop —
+and checks its behavior layer by layer:
 unification, conjunctive query, negation-as-absence, constraints-as-folds,
 grants-as-facts, admission/refusal, action execution, reconciler termination,
 and the workflow step graph stored as facts and queried by the engine
@@ -63,4 +68,4 @@ substrate iterates to fixpoint.
 If a case passes on one engine and fails on the other, that is a **language
 parity bug**, not a kernel bug. If a behavior cannot be expressed here without
 a new builtin, that is the Roots-of-Lisp failure the suite exists to catch —
-see `specs/vision/operational-algebra.md` §6.
+see the operational-effects section of the [language guide](../docs/language.md).

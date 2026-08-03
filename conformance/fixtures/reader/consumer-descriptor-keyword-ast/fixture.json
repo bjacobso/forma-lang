@@ -1,0 +1,21 @@
+{
+  "name": "Consumer descriptor keyword AST shape",
+  "category": "reader",
+  "sourceId": "consumer/descriptor-keyword-ast",
+  "source": {
+    "inline": "(define-form test-suite\n  (:doc \"Canonical test suite declaration.\")\n  (:identifiers\n    (identifier name Symbol (:declaration true)))\n  (:slots\n    (slot ontology value (:required true))))"
+  },
+  "operation": {
+    "kind": "parseAst"
+  },
+  "comparison": {
+    "mode": "sexpr"
+  },
+  "knownDivergence": {
+    "reason": "The TypeScript reader exposes colon-prefixed forms as Sym nodes, while the OCaml parseAst ABI exposes them as keyword nodes. Descriptor consumers inspect this AST shape directly.",
+    "owner": "forma-ocaml"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

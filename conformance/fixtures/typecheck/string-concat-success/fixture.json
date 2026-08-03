@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck string concat success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-string-concat-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

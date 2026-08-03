@@ -1,0 +1,15 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "reader/unexpected-eof",
+        "message": "Expected expression.",
+        "span": {
+          "end": 1,
+          "start": 0
+        }
+      }
+    ]
+  },
+  "success": false
+}

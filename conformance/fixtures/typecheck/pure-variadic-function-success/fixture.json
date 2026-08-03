@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck pure variadic function success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-pure-variadic-function-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

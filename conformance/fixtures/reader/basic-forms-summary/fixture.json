@@ -1,0 +1,17 @@
+{
+  "name": "Reader basic forms summary",
+  "category": "reader",
+  "sourceId": "parity/reader-basic-forms-summary",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "summary"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

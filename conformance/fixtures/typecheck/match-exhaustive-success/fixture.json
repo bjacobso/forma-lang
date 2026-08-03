@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck match exhaustive success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-match-exhaustive-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

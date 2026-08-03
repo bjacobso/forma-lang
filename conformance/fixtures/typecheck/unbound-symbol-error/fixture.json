@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck unbound symbol error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-unbound-symbol-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/type-mismatch",
+        "expected": "String",
+        "got": "Number",
+        "message": "Type mismatch: String vs Number",
+        "span": {
+          "end": 80,
+          "start": 40
+        }
+      }
+    ]
+  },
+  "success": false
+}

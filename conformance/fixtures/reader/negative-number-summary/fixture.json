@@ -1,0 +1,17 @@
+{
+  "name": "Reader negative number summary",
+  "category": "reader",
+  "sourceId": "parity/reader-negative-number-summary",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "summary"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

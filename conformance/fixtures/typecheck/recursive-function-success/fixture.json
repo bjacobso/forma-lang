@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck recursive function success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-recursive-function-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

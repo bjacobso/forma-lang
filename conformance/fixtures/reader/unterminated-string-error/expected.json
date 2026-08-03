@@ -1,0 +1,15 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "reader/unterminated-string",
+        "message": "Unterminated string literal.",
+        "span": {
+          "end": 5,
+          "start": 0
+        }
+      }
+    ]
+  },
+  "success": false
+}

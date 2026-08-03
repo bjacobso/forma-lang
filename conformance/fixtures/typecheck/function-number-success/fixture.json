@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck function number success",
+  "category": "typecheck",
+  "sourceId": "parity/type-function-number-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

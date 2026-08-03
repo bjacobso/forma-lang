@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck typeclass HKT instance string success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-typeclass-hkt-instance-string-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

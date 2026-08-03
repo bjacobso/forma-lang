@@ -1,0 +1,15 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/missing-field",
+        "message": "Missing field in record.",
+        "span": {
+          "end": 24,
+          "start": 0
+        }
+      }
+    ]
+  },
+  "success": false
+}

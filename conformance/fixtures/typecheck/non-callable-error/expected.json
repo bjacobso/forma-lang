@@ -1,0 +1,15 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/not-callable",
+        "message": "Cannot call non-function value.",
+        "span": {
+          "end": 5,
+          "start": 0
+        }
+      }
+    ]
+  },
+  "success": false
+}

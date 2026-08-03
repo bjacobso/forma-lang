@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck typeclass multiple instances success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-typeclass-multiple-instances-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

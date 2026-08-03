@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck let map destructure success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-let-map-destructure-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

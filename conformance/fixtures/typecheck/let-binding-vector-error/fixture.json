@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck let binding vector error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-let-binding-vector-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}
