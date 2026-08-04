@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck typeclass HKT instance direct builtin success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-typeclass-hkt-instance-direct-builtin-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

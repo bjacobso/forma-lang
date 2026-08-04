@@ -1,0 +1,16 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/pattern-redundancy",
+        "message": "Duplicate match arm for constructor 'Some'",
+        "span": {
+          "end": 95,
+          "start": 41
+        }
+      }
+    ],
+    "type": "Number"
+  },
+  "success": true
+}

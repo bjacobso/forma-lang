@@ -1,0 +1,17 @@
+{
+  "name": "Reader multiline string summary",
+  "category": "reader",
+  "sourceId": "parity/reader-multiline-string-summary",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "summary"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

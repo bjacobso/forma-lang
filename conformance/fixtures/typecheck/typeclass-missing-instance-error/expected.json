@@ -1,0 +1,11 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/missing-instance",
+        "message": "No instance found for Eq String."
+      }
+    ]
+  },
+  "success": false
+}

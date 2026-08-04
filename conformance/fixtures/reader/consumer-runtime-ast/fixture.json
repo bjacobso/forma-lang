@@ -1,0 +1,17 @@
+{
+  "name": "Consumer runtime AST shape",
+  "category": "reader",
+  "sourceId": "consumer/runtime-ast",
+  "source": {
+    "inline": "(str \"Hello \" (path data \"employeeName\"))\n(+ now 3600000)\n(define answer 42)\nanswer"
+  },
+  "operation": {
+    "kind": "parseAst"
+  },
+  "comparison": {
+    "mode": "sexpr"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

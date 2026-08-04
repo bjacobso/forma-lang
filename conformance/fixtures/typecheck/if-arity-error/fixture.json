@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck if arity error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-if-arity-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

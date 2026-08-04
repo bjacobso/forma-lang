@@ -1,0 +1,11 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/type-expression-shape",
+        "message": "Invalid type expression."
+      }
+    ]
+  },
+  "success": false
+}

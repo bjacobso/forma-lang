@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck curried arity mismatch error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-arity-mismatch-curried-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

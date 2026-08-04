@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck fn vector destructure success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-fn-vector-destructure-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

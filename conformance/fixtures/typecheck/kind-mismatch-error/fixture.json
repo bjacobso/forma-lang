@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck kind mismatch error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-kind-mismatch-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Reader unterminated map error",
+  "category": "reader",
+  "sourceId": "parity/reader-unterminated-map-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "parseDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

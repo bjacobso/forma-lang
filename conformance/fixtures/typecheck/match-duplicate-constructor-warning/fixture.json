@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck match duplicate constructor warning",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-match-duplicate-constructor-warning",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

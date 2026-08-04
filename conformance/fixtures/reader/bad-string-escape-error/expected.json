@@ -1,0 +1,15 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "reader/unterminated-string-escape",
+        "message": "Unterminated string escape.",
+        "span": {
+          "end": 5,
+          "start": 0
+        }
+      }
+    ]
+  },
+  "success": false
+}

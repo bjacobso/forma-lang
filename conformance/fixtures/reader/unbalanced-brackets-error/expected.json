@@ -1,0 +1,15 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "reader/unexpected-close",
+        "message": "Unexpected closing delimiter.",
+        "span": {
+          "end": 5,
+          "start": 4
+        }
+      }
+    ]
+  },
+  "success": false
+}

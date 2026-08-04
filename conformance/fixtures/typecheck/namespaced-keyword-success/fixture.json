@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck namespaced keyword success",
+  "category": "typecheck",
+  "sourceId": "parity/type-namespaced-keyword-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

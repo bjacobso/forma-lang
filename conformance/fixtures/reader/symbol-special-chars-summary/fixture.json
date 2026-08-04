@@ -1,0 +1,17 @@
+{
+  "name": "Reader symbol special chars summary",
+  "category": "reader",
+  "sourceId": "parity/reader-symbol-special-chars-summary",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "summary"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

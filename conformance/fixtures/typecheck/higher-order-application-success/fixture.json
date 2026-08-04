@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck higher order application success",
+  "category": "typecheck",
+  "sourceId": "parity/type-higher-order-application-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

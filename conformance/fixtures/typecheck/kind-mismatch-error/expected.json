@@ -1,0 +1,11 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/kind-mismatch",
+        "message": "Invalid type constructor application."
+      }
+    ]
+  },
+  "success": false
+}

@@ -1,0 +1,15 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "reader/unclosed-map",
+        "message": "Unclosed map literal.",
+        "span": {
+          "end": 1,
+          "start": 0
+        }
+      }
+    ]
+  },
+  "success": false
+}

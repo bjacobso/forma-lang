@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck typeclass aliased missing instance error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-typeclass-aliased-missing-instance-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "diagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck typeclass higher order missing instance error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-typeclass-higher-order-missing-instance-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "diagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

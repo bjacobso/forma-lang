@@ -1,0 +1,16 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/pattern-redundancy",
+        "message": "Unreachable match arm(s) after wildcard pattern",
+        "span": {
+          "end": 88,
+          "start": 41
+        }
+      }
+    ],
+    "type": "Number"
+  },
+  "success": true
+}

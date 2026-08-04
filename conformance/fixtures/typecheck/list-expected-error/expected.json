@@ -1,0 +1,17 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/type-mismatch",
+        "expected": "List",
+        "got": "Number",
+        "message": "Type mismatch: List vs Number",
+        "span": {
+          "end": 9,
+          "start": 0
+        }
+      }
+    ]
+  },
+  "success": false
+}

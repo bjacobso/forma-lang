@@ -1,0 +1,17 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/type-mismatch",
+        "expected": "Map",
+        "got": "Number",
+        "message": "Type mismatch: Map vs Number",
+        "span": {
+          "end": 13,
+          "start": 0
+        }
+      }
+    ]
+  },
+  "success": false
+}

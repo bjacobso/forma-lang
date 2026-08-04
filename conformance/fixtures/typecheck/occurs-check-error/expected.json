@@ -1,0 +1,15 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "typecheck/occurs-check",
+        "message": "Infinite type.",
+        "span": {
+          "end": 13,
+          "start": 8
+        }
+      }
+    ]
+  },
+  "success": false
+}

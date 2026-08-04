@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck non-callable error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-non-callable-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck typeclass HKT signature success",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-typeclass-hkt-signature-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

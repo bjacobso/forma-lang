@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck else keyword success",
+  "category": "typecheck",
+  "sourceId": "parity/type-keyword-else-success",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "type"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "types": {
+    "ocaml": "Str -> Effect<Unit, ErrorSet<ConsoleUnavailable>, RequirementSet<Console.print>>",
+    "typescript": "String -> Effect<Unit, ErrorSet<ConsoleUnavailable>, RequirementSet<Console.print>>"
+  },
+  "serviceCapability": "Console.print",
+  "failedErrorType": "ConsoleUnavailable",
+  "caughtErrorType": "ConsoleUnavailable",
+  "authorityCapabilities": ["Console.print"]
+}

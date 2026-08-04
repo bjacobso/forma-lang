@@ -1,0 +1,17 @@
+{
+  "name": "Reader vector map summary",
+  "category": "reader",
+  "sourceId": "parity/reader-vector-map-summary",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "summary"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

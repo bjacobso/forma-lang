@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck keyword literal warning",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-keyword-literal-warning",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

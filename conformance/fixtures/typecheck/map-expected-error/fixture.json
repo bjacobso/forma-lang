@@ -1,0 +1,17 @@
+{
+  "name": "Typecheck map expected error",
+  "category": "typecheck",
+  "sourceId": "parity/typecheck-map-expected-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "typecheck"
+  },
+  "comparison": {
+    "mode": "typeDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

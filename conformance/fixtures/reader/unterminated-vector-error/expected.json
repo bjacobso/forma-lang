@@ -1,0 +1,15 @@
+{
+  "normalized": {
+    "diagnostics": [
+      {
+        "code": "reader/unclosed-sequence",
+        "message": "Unclosed sequence.",
+        "span": {
+          "end": 1,
+          "start": 0
+        }
+      }
+    ]
+  },
+  "success": false
+}

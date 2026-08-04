@@ -1,0 +1,73 @@
+{
+  "normalized": [
+    {
+      "items": [
+        {
+          "kind": "symbol",
+          "value": "str"
+        },
+        {
+          "kind": "string",
+          "value": "Hello "
+        },
+        {
+          "items": [
+            {
+              "kind": "symbol",
+              "value": "path"
+            },
+            {
+              "kind": "symbol",
+              "value": "data"
+            },
+            {
+              "kind": "string",
+              "value": "employeeName"
+            }
+          ],
+          "kind": "list"
+        }
+      ],
+      "kind": "list"
+    },
+    {
+      "items": [
+        {
+          "kind": "symbol",
+          "value": "+"
+        },
+        {
+          "kind": "symbol",
+          "value": "now"
+        },
+        {
+          "kind": "int",
+          "value": 3600000
+        }
+      ],
+      "kind": "list"
+    },
+    {
+      "items": [
+        {
+          "kind": "symbol",
+          "value": "define"
+        },
+        {
+          "kind": "symbol",
+          "value": "answer"
+        },
+        {
+          "kind": "int",
+          "value": 42
+        }
+      ],
+      "kind": "list"
+    },
+    {
+      "kind": "symbol",
+      "value": "answer"
+    }
+  ],
+  "success": true
+}

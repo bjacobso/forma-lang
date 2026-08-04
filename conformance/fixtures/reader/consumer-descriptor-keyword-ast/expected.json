@@ -1,0 +1,109 @@
+{
+  "normalized": [
+    {
+      "items": [
+        {
+          "kind": "symbol",
+          "value": "define-form"
+        },
+        {
+          "kind": "symbol",
+          "value": "test-suite"
+        },
+        {
+          "items": [
+            {
+              "kind": "keyword",
+              "value": ":doc"
+            },
+            {
+              "kind": "string",
+              "value": "Canonical test suite declaration."
+            }
+          ],
+          "kind": "list"
+        },
+        {
+          "items": [
+            {
+              "kind": "keyword",
+              "value": ":identifiers"
+            },
+            {
+              "items": [
+                {
+                  "kind": "symbol",
+                  "value": "identifier"
+                },
+                {
+                  "kind": "symbol",
+                  "value": "name"
+                },
+                {
+                  "kind": "symbol",
+                  "value": "Symbol"
+                },
+                {
+                  "items": [
+                    {
+                      "kind": "keyword",
+                      "value": ":declaration"
+                    },
+                    {
+                      "kind": "bool",
+                      "value": true
+                    }
+                  ],
+                  "kind": "list"
+                }
+              ],
+              "kind": "list"
+            }
+          ],
+          "kind": "list"
+        },
+        {
+          "items": [
+            {
+              "kind": "keyword",
+              "value": ":slots"
+            },
+            {
+              "items": [
+                {
+                  "kind": "symbol",
+                  "value": "slot"
+                },
+                {
+                  "kind": "symbol",
+                  "value": "ontology"
+                },
+                {
+                  "kind": "symbol",
+                  "value": "value"
+                },
+                {
+                  "items": [
+                    {
+                      "kind": "keyword",
+                      "value": ":required"
+                    },
+                    {
+                      "kind": "bool",
+                      "value": true
+                    }
+                  ],
+                  "kind": "list"
+                }
+              ],
+              "kind": "list"
+            }
+          ],
+          "kind": "list"
+        }
+      ],
+      "kind": "list"
+    }
+  ],
+  "success": true
+}

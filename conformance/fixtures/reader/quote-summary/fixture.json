@@ -1,0 +1,17 @@
+{
+  "name": "Reader quote summary",
+  "category": "reader",
+  "sourceId": "parity/reader-quote-summary",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "summary"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}

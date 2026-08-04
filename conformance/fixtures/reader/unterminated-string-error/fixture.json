@@ -1,0 +1,17 @@
+{
+  "name": "Reader unterminated string error",
+  "category": "reader",
+  "sourceId": "parity/reader-unterminated-string-error",
+  "source": {
+    "file": "source.lisp"
+  },
+  "operation": {
+    "kind": "parseSummary"
+  },
+  "comparison": {
+    "mode": "parseDiagnostics"
+  },
+  "expected": {
+    "file": "expected.json"
+  }
+}
